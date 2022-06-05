@@ -7,22 +7,22 @@ import argparse
 
 
 def parser():
-    parser = argparse.ArgumentParser(description='Ingest CSV data to Postgres')
+    parser = argparse.ArgumentParser(description="Ingest CSV data to Postgres")
 
-    parser.add_argument('--user', help='Postgres username')
-    parser.add_argument('--password', help='Postgres password')
-    parser.add_argument('--host', help='Postgres host')
-    parser.add_argument('--port', help='Postgres exposed port')
-    parser.add_argument('--db', help='Database name for postgres')
-    parser.add_argument('--table_name', help='Name of the target table ')
-    parser.add_argument('--url', help='URL of the csv file')
+    parser.add_argument("--user", help="Postgres username")
+    parser.add_argument("--password", help="Postgres password")
+    parser.add_argument("--host", help="Postgres host")
+    parser.add_argument("--port", help="Postgres exposed port")
+    parser.add_argument("--db", help="Database name for postgres")
+    parser.add_argument("--table_name", help="Name of the target table ")
+    parser.add_argument("--url", help="URL of the csv file")
 
     args = parser.parse_args()
     return args
 
 
 def download_data(url, output):
-    os.system(f'wget {url} -O {output}')
+    os.system(f"wget {url} -O {output}")
 
 
 def main():
@@ -42,14 +42,15 @@ def main():
         download_data(url, output)
 
     engine = create_engine(
-        f'postgresql://{user}:{password}@{host}:{port}/{db}')
+        f"postgresql://{user}:{password}@{host}:{port}/{db}")
     engine.connect()
 
     df_iter = pd.read_csv(
-        './yellow_tripdata_2022-01.csv',
-        parse_dates=['tpep_pickup_datetime', 'tpep_dropoff_datetime'],
+        "./yellow_tripdata_2022-01.csv",
+        parse_dates=["tpep_pickup_datetime", "tpep_dropoff_datetime"],
         iterator=True,
-        chunksize=100000)
+        chunksize=100000,
+    )
 
     print(next(df_iter).columns)
 
@@ -58,7 +59,7 @@ def main():
         row, _ = data.shape
         total_row += row
         time_start = time()
-        data.to_sql(name=table_name, con=engine, if_exists='append')
+        data.to_sql(name=table_name, con=engine, if_exists="append")
         time_end = time()
         print(
             f"Appending {row} data to {table_name}, took {time_end - time_start} seconds"
